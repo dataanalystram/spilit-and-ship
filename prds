@@ -1,0 +1,125 @@
+Planning Web Tool Design
+
+I'm moving away from just scripting, and now envision a full web-based tool for splitting CSV files. The core features will be a user-friendly interface for configuring file size and row limits. This is a big step from the Gainsight context! I need a solid plan before even considering the tech.
+
+Analyzing Large File Constraints
+
+I'm now fully immersed in the technical constraints, particularly file size limitations for the new web tool. I need to handle potential 2GB+ CSV files, specifically focusing on how to do this browser-side. This means digging into the HTML5 File API and Streams API and how best to implement them to meet the need for privacy and speed. The plan's coming together, but I still need to iron out UI/UX flow details. I'm calling it the "Client-Side Secure CSV Splitter".
+
+Refining File Processing Strategy
+
+I'm now integrating Web Workers for UI responsiveness and JSZip for output bundling. I need to make sure the Gainsight context is covered by adding a preset button for Gainsight-specific file size limits. A Product Requirements Document (PRD) is now forming. The client-side web app approach will be the primary plan. I'm focusing on user-friendliness and addressing the 2GB upload bottleneck. I'm moving away from hosting a Python script as a solution. I am also planning on focusing my search on streaming libraries to ensure the plan's technical feasibility.
+
+Formulating the Strategy
+
+I'm solidifying the plan. My focus is now on crafting a tool that's accessible online, ensuring that Gainsight's team or external users can utilize it easily. We are honing in on the crucial elements that will make this a success.
+
+Analyzing the Approach
+
+I've been wrestling with the technical implementation for Gainsight CSV handling. The current focus is a "Gainsight Mode" within the tool. I'm prioritizing user experience with automated split size (200MB), file prefix formatting, and zipping for easy download. It looks like file.slice and file.stream() are the best approach, but line alignment is proving to be a challenge. I need to ensure rows aren't split during processing.
+
+This is a comprehensive plan to build a Browser-Based CSV Splitter specifically optimized for Gainsight users.
+
+Because the processing happens 100% in the user's browser (Client-Side), it solves the biggest problem: Security & Speed. Users don't have to wait to upload a 2GB file to a server, and sensitive data never leaves their computer.
+
+Product Name: Split & Ship (Gainsight Edition)
+1. User Experience (UX) Flow
+The goal is "Zero Confusion." A user seeing a "File Too Large" error in Gainsight should be able to fix it here in under 30 seconds.
+
+Step 1: The "Drop Zone" (Landing)
+Action: Large, clean drag-and-drop area.
+
+Visual Cue: Text saying "Drop your CSV here (Up to 10GB+ supported)".
+
+Immediate Feedback: As soon as the file drops, show the file name, total size (e.g., "2.1 GB"), and total row count (calculated via a quick stream scan).
+
+Step 2: Configuration (The "Easy Button")
+Give users two distinct paths:
+
+Path A: "Gainsight Safe Mode" (Recommended)
+
+One-Click Button: Automatically sets the split size to 200 MB (Gainsight's safe zone) and ensures the filename works with Gainsight's wildcard match.
+
+Why: Removes the guesswork for the user.
+
+Path B: Custom Mode
+
+Input Fields: Allow splitting by Max File Size (MB) OR Max Rows.
+
+Naming: Custom prefix field (e.g., usage_data_part_).
+
+Step 3: Processing & Visualization
+Visual: A progress bar showing "Processing Part 1... Part 2...".
+
+Crucial UX Detail: Don't freeze the browser. Use a "Web Worker" (background thread) so the user can still scroll or cancel while it processes.
+
+Step 4: The Output
+Action: Single button: "Download All as ZIP".
+
+Bonus: Display the specific "Wildcard Pattern" the user needs to type into Gainsight (e.g., "In Gainsight S3 settings, use prefix: upload_part_").
+
+2. Technical Architecture (For Developers)
+To build this, you need a stack that handles large files without crashing the browser tab (OOM - Out of Memory errors).
+
+Tech Stack: React (or Vue/Svelte) + Web Workers.
+
+Key Library: JSZip (for bundling results).
+
+The Logic (The "Slice & Seek" Method):
+
+Do NOT load the whole file into RAM.
+
+Do NOT read line-by-line (too slow for 2GB).
+
+The Algorithm:
+
+Read Header: Extract the first line (Bytes 0 to N) to keep for every file.
+
+Chunking: Calculate the byte offset for the target size (e.g., 200MB).
+
+Alignment: Jump to that 200MB mark, then read forward byte-by-byte to find the nearest \n (newline character).
+
+Slice: Cut the file at that exact newline using File.slice(start, end).
+
+Repeat: Start the next chunk from that newline.
+
+Save: Stream these slices directly into a ZIP file.
+
+3. UI Design Mockup (Mental Draft)
+Plaintext
++---------------------------------------------------------------+
+|  [Logo] CSV Splitter for Gainsight                            |
++---------------------------------------------------------------+
+|                                                               |
+|   +-------------------------------------------------------+   |
+|   |                                                       |   |
+|   |   [ Icon: CSV File ]                                  |   |
+|   |   Drag & Drop your 2GB+ CSV here                      |   |
+|   |   (No data leaves your browser)                       |   |
+|   |                                                       |   |
+|   +-------------------------------------------------------+   |
+|                                                               |
+|   Configuration:                                              |
+|   (o) Gainsight Safe Mode (Split into 200MB chunks)           |
+|   ( ) Custom (Split by ____ MB or ____ Rows)                  |
+|                                                               |
+|   [ Start Splitting ]                                         |
+|                                                               |
+|   Progress: [==========      ] Part 3 of 10 ready...          |
+|                                                               |
+|   [ Download ZIP ]                                            |
+|                                                               |
+|   [!] Tip: In Gainsight Rules Engine, set file search         |
+|       to "Starts With" -> "split_part_"                       |
+|                                                               |
++---------------------------------------------------------------+
+4. Implementation Plan (Next Steps)
+If you want to build this tool, here is the roadmap:
+
+Phase 1 (Prototype): Create a simple HTML/JS page that uses File.slice to split a test CSV into 3 parts.
+
+Phase 2 (Worker Integration): Move the processing to a WebWorker.js file to prevent the browser from freezing during the 2GB crunch.
+
+Phase 3 (Gainsight Logic): Add the specific logic to ensure headers are copied to every single part.
+
+Phase 4 (Deploy): Host on GitHub Pages or Vercel (free, since it's a static site).
