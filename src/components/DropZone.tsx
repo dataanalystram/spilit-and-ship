@@ -6,9 +6,11 @@ interface DropZoneProps {
     onFileSelected: (file: File) => void;
     selectedFile: File | null;
     disabled?: boolean;
+    title?: string;
+    subtitle?: string;
 }
 
-export function DropZone({ onFileSelected, selectedFile, disabled }: DropZoneProps) {
+export function DropZone({ onFileSelected, selectedFile, disabled, title, subtitle }: DropZoneProps) {
     const [isDragActive, setIsDragActive] = useState(false);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -82,14 +84,16 @@ export function DropZone({ onFileSelected, selectedFile, disabled }: DropZonePro
                     ) : (
                         <>
                             <h3 className="text-lg font-semibold text-slate-900">
-                                Drag & drop your CSV here
+                                {title || "Drag & drop your CSV here"}
                             </h3>
                             <p className="text-sm text-slate-500">
-                                or click to browse from your computer
+                                {subtitle || "or click to browse from your computer"}
                             </p>
-                            <p className="text-xs text-slate-400 mt-2">
-                                Up to 10GB+ supported • Local processing only
-                            </p>
+                            {!subtitle && (
+                                <p className="text-xs text-slate-400 mt-2">
+                                    Up to 10GB+ supported • Local processing only
+                                </p>
+                            )}
                         </>
                     )}
                 </div>

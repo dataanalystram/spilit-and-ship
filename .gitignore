@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Test files (large CSV test data)
+test-files/
+
+# Meeting Transcripts & PII
+Harri-*.md
+Lab-*.md

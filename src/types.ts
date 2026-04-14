@@ -41,3 +41,33 @@ export interface ErrorMessage {
 }
 
 export type WorkerResponse = ProgressMessage | PartReadyMessage | CompleteMessage | ErrorMessage;
+
+export interface DataCleaningConfig {
+    removeBlankColumns: boolean;
+    fixDateFormatting: boolean;
+    removeDuplicates: boolean;
+    applyGainsightRules: boolean;
+    primaryKeyColumn?: string;
+}
+
+export interface ETLTransformationConfig {
+    companyIdColumn: string;
+    relationshipIdColumn?: string;
+    dataSource: string;
+    metricColumns: string[];
+    dateColumn: string;
+    timeGranularity: 'Daily' | 'Weekly' | 'Monthly' | 'Quarterly';
+    baselineColumn?: string;
+    targetColumn?: string;
+    extraColumns: string[];
+}
+
+export interface CleanedDataResult {
+    data: any[];
+    originalRowCount: number;
+    cleanedRowCount: number;
+    removedColumns: string[];
+    logs: string[];
+}
+
+export type CompanyMetric = Record<string, string>;
