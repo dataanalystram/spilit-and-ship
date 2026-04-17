@@ -60,7 +60,7 @@ export function DropZone({ onFileSelected, selectedFile, disabled, title, subtit
                 id="file-upload"
                 type="file"
                 className="hidden"
-                accept=".csv,.txt"
+                accept=".csv,.txt,.xlsx,.xls"
                 onChange={handleFileInput}
                 disabled={disabled}
             />

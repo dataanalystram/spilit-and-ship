@@ -145,7 +145,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Header */}
         <div className="text-center space-y-6">
@@ -415,7 +415,7 @@ function App() {
 
           {/* TAB 3: ETL ENGINE */}
           {activeTab === 'etl' && (
-            <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="p-6 animate-in fade-in slide-in-from-right-4 duration-300">
               <DataCleanerETL />
             </div>
           )}
