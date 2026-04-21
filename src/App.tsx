@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { DropZone } from './components/DropZone';
 import { Configuration } from './components/Configuration';
-import { RichTextFormatter } from './components/RichTextFormatter';
 import { DataCleanerETL } from './components/DataCleanerETL';
-import { GainsightCSVCleaner } from './components/GainsightCSVCleaner';
+// import { RichTextFormatter } from './components/RichTextFormatter';
+// import { GainsightCSVCleaner } from './components/GainsightCSVCleaner';
 import type { SplitConfig, WorkerResponse } from './types';
-import { FileDown, RefreshCw, Loader2, Play, Download, Package, AlertTriangle, ArrowLeft, HardDrive, FileText, Split, Database, ShieldAlert } from 'lucide-react';
+import { FileDown, RefreshCw, Loader2, Play, Download, Package, AlertTriangle, ArrowLeft, HardDrive, Split, Database, FileText, ShieldAlert } from 'lucide-react';
 
 interface PartFile {
   url: string;
@@ -175,16 +175,6 @@ function App() {
                 <span>CSV Splitter</span>
               </button>
               <button
-                onClick={() => { setActiveTab('formatter'); setFile(null); }}
-                className={`flex items-center space-x-2 px-6 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'formatter'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-              >
-                <FileText className="w-4 h-4" />
-                <span>Rich Text Formatter</span>
-              </button>
-              <button
                 onClick={() => { setActiveTab('etl'); setFile(null); }}
                 className={`flex items-center space-x-2 px-6 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'etl'
                   ? 'bg-teal-600 text-white shadow-md'
@@ -193,6 +183,17 @@ function App() {
               >
                 <Database className="w-4 h-4" />
                 <span>Data Cleaning & ETL</span>
+              </button>
+              {/* 
+              <button
+                onClick={() => { setActiveTab('formatter'); setFile(null); }}
+                className={`flex items-center space-x-2 px-6 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'formatter'
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+              >
+                <FileText className="w-4 h-4" />
+                <span>Rich Text Formatter</span>
               </button>
               <button
                 onClick={() => { setActiveTab('cleaner'); setFile(null); }}
@@ -204,12 +205,13 @@ function App() {
                 <ShieldAlert className="w-4 h-4 text-[#6c63ff]" />
                 <span>Gainsight Cleaner</span>
               </button>
+              */}
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200">
 
           {/* TAB 1: SPLITTER */}
           {activeTab === 'splitter' && (
@@ -406,27 +408,30 @@ function App() {
             </div>
           )}
 
-          {/* TAB 2: FORMATTER */}
-          {activeTab === 'formatter' && (
-            <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300">
-              <RichTextFormatter />
-            </div>
-          )}
-
-          {/* TAB 3: ETL ENGINE */}
+          {/* TAB 2: ETL ENGINE */}
           {activeTab === 'etl' && (
             <div className="p-6 animate-in fade-in slide-in-from-right-4 duration-300">
               <DataCleanerETL />
             </div>
           )}
 
-          {/* TAB 4: GAINSIGHT CSV CLEANER */}
+          {/* TAB 3: FORMATTER (COMMENTS FOR FUTURE USE) */}
+          {/*
+          {activeTab === 'formatter' && (
+            <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300">
+              <RichTextFormatter />
+            </div>
+          )}
+          */}
+
+          {/* TAB 4: GAINSIGHT CSV CLEANER (COMMENTS FOR FUTURE USE) */}
+          {/*
           {activeTab === 'cleaner' && (
             <div className="bg-[#0d0f1a] animate-in fade-in slide-in-from-right-4 duration-300">
               <GainsightCSVCleaner />
             </div>
           )}
-
+          */}
         </div>
 
         {/* Footer */}

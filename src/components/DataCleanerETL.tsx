@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Papa from 'papaparse';
 import { DropZone } from './DropZone';
+import { S3Connector } from './S3Connector';
 import { cleanData } from '../lib/data-cleaner';
 import { transformToCompanyMetrics } from '../lib/etl-transformer';
 import { downloadCSV, formatToRFC4180 } from '../lib/rfc4180-formatter';
@@ -346,6 +347,36 @@ export function DataCleanerETL() {
         const safe = sanitizeFilename(s.name);
         return s.mode === 'etl' ? `${safe}_metrics.csv` : `${safe}_cleaned.csv`;
     };
+
+    // Date suffix for S3 file naming
+    const todaySuffix = new Date().toISOString().split('T')[0];
+
+    const sheetFilenameWithDate = (s: SheetState): string => {
+        const safe = sanitizeFilename(s.name);
+        const suffix = s.mode === 'etl' ? '_metrics' : '_cleaned';
+        return `${safe}${suffix}_${todaySuffix}.csv`;
+    };
+
+    // Build S3 upload payload from all processed sheets
+    const s3Sheets = useMemo(() => {
+        return sheetOrder
+            .filter(n => sheetMap[n]?.status === 'processed')
+            .map(n => {
+                const s = sheetMap[n];
+                return {
+                    sheetName: s.name,
+                    csvContent: sheetToCSV(s),
+                    fileName: sheetFilenameWithDate(s),
+                };
+            })
+            .filter(s => s.csvContent.length > 0);
+    }, [sheetMap, sheetOrder]);
+
+    // Default S3 folder name from the uploaded file
+    const defaultS3Folder = useMemo(() => {
+        if (!file) return 'upload';
+        return sanitizeFilename(file.name.replace(/\.[^.]+$/, ''));
+    }, [file]);
 
     const downloadSingle = (name: string) => {
         const s = sheetMap[name];
@@ -916,8 +947,8 @@ export function DataCleanerETL() {
 
                                 {/* ── Step 3: Output Preview ── */}
                                 {step === 3 && activeState.status === 'processed' && (
-                                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                                        <div className="px-5 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between flex-wrap gap-3">
+                                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm">
+                                        <div className="px-5 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between flex-wrap gap-3 rounded-t-xl">
                                             <div className="flex items-center">
                                                 <span className="bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
                                                     {activeState.mode === 'etl' ? 3 : 2}
@@ -996,6 +1027,19 @@ export function DataCleanerETL() {
                                                     Upload to Gainsight S3 → Data Management → Company Metrics
                                                 </span>
                                             </div>
+
+                                            {/* ── Per-sheet S3 Upload ── */}
+                                            {activeState.status === 'processed' && sheetToCSV(activeState).length > 0 && (
+                                                <S3Connector
+                                                    sheets={[{
+                                                        sheetName: activeState.name,
+                                                        csvContent: sheetToCSV(activeState),
+                                                        fileName: sheetFilenameWithDate(activeState),
+                                                    }]}
+                                                    defaultFolderName={defaultS3Folder}
+                                                />
+                                            )}
+
                                         </div>
                                     </div>
                                 )}
@@ -1003,6 +1047,16 @@ export function DataCleanerETL() {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* ════════════════════════════════════════════════════════════════
+                FULL-WIDTH S3 CONNECTOR — below the main workspace
+            ════════════════════════════════════════════════════════════════ */}
+            {s3Sheets.length > 0 && (
+                <S3Connector
+                    sheets={s3Sheets}
+                    defaultFolderName={defaultS3Folder}
+                />
             )}
         </div>
     );

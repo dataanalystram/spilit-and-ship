@@ -33,3 +33,8 @@ Lab-*.md
 *.csv
 *.xlsx
 
+# Environment secrets (AWS credentials) — NEVER commit
+.env
+.env.local
+.env.production
+
