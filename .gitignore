@@ -29,3 +29,7 @@ test-files/
 # Meeting Transcripts & PII
 Harri-*.md
 Lab-*.md
+
+*.csv
+*.xlsx
+
